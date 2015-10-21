@@ -1,3 +1,6 @@
+# Enable Strict Aliasing Optimizations
+CFLAGS_KERNEL += -fstrict-aliasing
+
 # CPUfreq core
 obj-$(CONFIG_CPU_FREQ)			+= cpufreq.o cpu_load_metric.o
 # CPUfreq stats
