@@ -44,6 +44,8 @@ export SUBARCH=arm64
 export ccache=ccache
 export USE_SEC_FIPS_MODE=true
 export KCONFIG_NOTIMESTAMP=true
+export KBUILD_BUILD_USER=Xile
+export KBUILD_BUILD_HOST=Xile
 echo "Done"
 echo
 
