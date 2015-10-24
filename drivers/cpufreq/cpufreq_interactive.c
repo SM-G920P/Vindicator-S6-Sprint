@@ -754,28 +754,7 @@ static void cpufreq_interactive_timer(unsigned long data)
 		new_freq = choose_freq(pcpu, loadadjfreq);
 		if (new_freq > tunables->hispeed_freq && pcpu->target_freq < tunables->hispeed_freq)
 			new_freq = tunables->hispeed_freq;
-
-		if (sync_freq && new_freq < sync_freq) {
-
-			max_load = 0;
-			max_freq = 0;
-
-			for_each_online_cpu(i) {
-				picpu = &per_cpu(cpuinfo, i);
-
-				if (i == data || picpu->prev_load <
-						up_threshold_any_cpu_load)
-					continue;
-
-				max_load = max(max_load, picpu->prev_load);
-				max_freq = max(max_freq, picpu->target_freq);
-			}
-
-			if (max_freq > up_threshold_any_cpu_freq &&
-				max_load >= up_threshold_any_cpu_load)
-				new_freq = sync_freq;
-		}
->>>>>>> f52f11c... cpufreq: interactive: prevents the frequency to directly raise above the hispeed_freq from a lower frequency.
+			
 	}
 
 	if (cpu_load <= MAX_LOCAL_LOAD &&
