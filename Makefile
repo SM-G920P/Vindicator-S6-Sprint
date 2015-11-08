@@ -382,8 +382,8 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 
 GRAPHITE = -fgraphite-identity -ftree-loop-linear -floop-interchange -floop-strip-mine -floop-block -floop-flatten -floop-nest-optimize
 
-KBUILD_CFLAGS   := -DNDEBUG $(GRAPHITE) -w -Wstrict-prototypes -Wno-trigraphs \
-		   -fno-strict-aliasing -fno-common \
+KBUILD_CFLAGS   := -DNDEBUG $(GRAPHITE) -Wall -Wstrict-prototypes -Wno-trigraphs \
+		   -Werror=strict-aliasing -fno-common \
 		   -fivopts -funswitch-loops -fpredictive-commoning \
 		   -Werror-implicit-function-declaration -funsafe-loop-optimizations \
 		   -Wno-format-security -pipe -fno-pic \
@@ -590,7 +590,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 else
-KBUILD_CFLAGS	+= -Ofast $(call cc-disable-warning,maybe-uninitialized,)
+KBUILD_CFLAGS	+= -Ofast
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
