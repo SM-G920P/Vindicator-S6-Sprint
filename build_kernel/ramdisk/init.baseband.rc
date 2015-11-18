@@ -1,3 +1,4 @@
+
 on early-init
     symlink /data/tombstones /tombstones
     mkdir /cpdump 0771 system system
@@ -21,6 +22,23 @@ on boot
     mkdir /dev/socket/qmux_gps 0770 gps gps
     chmod 2770 /dev/socket/qmux_gps
 
+on init
+    mkdir /efs 0771 radio system
+    symlink /dev/block/platform/15570000.ufs/by-name/RADIO /dev/mbin0
+    #restorecon /dev/mbin0
+
+    symlink  /sys/devices/10f24000.mipi-lli /dev/mipi-lli
+
+    write /sys/class/net/rmnet0/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet1/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet2/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet3/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet4/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet5/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet6/queues/rx-0/rps_cpus 7
+    write /sys/class/net/rmnet7/queues/rx-0/rps_cpus 7
+    write /proc/sys/net/core/netdev_max_backlog 5000
+
 on fs
 #MDM requirement
     mkdir /dev/block/modem
@@ -37,6 +55,14 @@ on fs
     chown system radio /dev/block/modem/dump_path
     chmod 0775 /dev/block/modem/dump_path
 
+# CP Boot Daemon (CBD)
+service cpboot-daemon /sbin/cbd -d -t ss333 -b s -m l -P platform/15570000.ufs/by-name/RADIO
+    class main
+    user root
+    group radio cache inet misc audio sdcard_r sdcard_rw log shell
+    #seclabel u:r:cbd:s0
+on property:persist.sys.cpboot=disable
+    stop cpboot-daemon
 
     mkdir /firmware 0771 system system
     mount vfat /dev/block/platform/15570000.ufs/by-name/RADIO /firmware ro shortname=lower fmask=0133,dmask=0022

@@ -48,16 +48,9 @@ on post-fs-data
 
     export ENC_EMULATED_STORAGE_TARGET /storage/enc_emulated
 
-    restorecon /data/knox
+    #restorecon /data/knox
 
 on boot
-
-#group system log shell
-service epmlogd /system/bin/epmlogd
-    class main
-    user system
-    group system log shell
-    oneshot
 
 service sdp_cryptod /system/bin/sdp_cryptod
     class main

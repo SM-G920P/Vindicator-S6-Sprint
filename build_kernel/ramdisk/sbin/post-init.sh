@@ -1,100 +1,145 @@
 #!/system/bin/sh
 
-# Galaxy S6 Lollipop 5.1.1 Post-Init ramdisk script
-# By g.lewarne @ xda
+# interactive governor
+chown -R system:system /sys/devices/system/cpu/cpu0/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu0/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu0/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu1/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu1/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu1/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu2/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu2/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu2/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu3/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu3/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu3/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu4/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu4/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu4/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu5/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu5/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu5/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu6/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu6/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu6/cpufreq/interactive
+chown -R system:system /sys/devices/system/cpu/cpu7/cpufreq/interactive
+chmod -R 0666 /sys/devices/system/cpu/cpu7/cpufreq/interactive
+chmod 0755 /sys/devices/system/cpu/cpu7/cpufreq/interactive
 
-# Parse Mode Enforcement from prop
-if [ "`grep "kernel.turbo=true" /system/unikernel.prop`" != "" ]; then
-	echo "1" > /sys/devices/system/cpu/cpu0/cpufreq/interactive/enforced_mode
-	echo "1" > /sys/devices/system/cpu/cpu4/cpufreq/interactive/enforced_mode
+#Setup Mhz Min/Max Cluster 0
+echo 400000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq;
+echo 1500000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
+echo 400000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq;
+echo 1500000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq;
+echo 400000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq;
+echo 1500000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq;
+echo 400000 > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq;
+echo 1500000 > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq;
+
+#Setup Mhz Min/Max Cluster 1
+echo 800000 > /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq;
+echo 2100000 > /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq;
+echo 800000 > /sys/devices/system/cpu/cpu5/cpufreq/scaling_min_freq;
+echo 2100000 > /sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq;
+echo 800000 > /sys/devices/system/cpu/cpu6/cpufreq/scaling_min_freq;
+echo 2100000 > /sys/devices/system/cpu/cpu6/cpufreq/scaling_max_freq;
+echo 800000 > /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq;
+echo 2100000 > /sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq;
+
+#e/frandom permissions
+chmod 444 /dev/erandom
+chmod 444 /dev/frandom
+
+#Make sure perms are correct
+chmod 755 /sys/kernel/hmp/power_migration
+
+#Fix GPS Wake Issues. From LSpeed Mod 
+mount -o remount,rw /
+mount -o remount,rw rootfs
+mount -o remount,rw /system
+busybox mount -o remount,rw /
+busybox mount -o remount,rw rootfs
+busybox mount -o remount,rw /system
+
+busybox sleep 40
+su -c "pm enable com.google.android.gms/.update.SystemUpdateActivity"
+su -c "pm enable com.google.android.gms/.update.SystemUpdateService"
+su -c "pm enable com.google.android.gms/.update.SystemUpdateService$ActiveReceiver"
+su -c "pm enable com.google.android.gms/.update.SystemUpdateService$Receiver"
+su -c "pm enable com.google.android.gms/.update.SystemUpdateService$SecretCodeReceiver"
+su -c "pm enable com.google.android.gsf/.update.SystemUpdateActivity"
+su -c "pm enable com.google.android.gsf/.update.SystemUpdatePanoActivity"
+su -c "pm enable com.google.android.gsf/.update.SystemUpdateService"
+su -c "pm enable com.google.android.gsf/.update.SystemUpdateService$Receiver"
+su -c "pm enable com.google.android.gsf/.update.SystemUpdateService$SecretCodeReceiver"
+
+#Setup vindicator file location if it doesn't exist already
+[ ! -d "/data/data/vindicator" ] && mkdir /data/data/vindicator
+chmod 755 /data/data/vindicator
+
+# init.d support
+/system/xbin/busybox run-parts /system/etc/init.d
+
+# Apollo Minfreq
+CFILE="/data/data/vindicator/APminfreq"
+if [ -f $CFILE ]; then 
+	FREQ=`cat $CFILE`
+	echo $FREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
 fi
 
-# Wait for 5 second so we pass out of init before starting the rest of the script
-sleep 5
-
-# Start SuperSU daemon
-/system/xbin/daemonsu --auto-daemon &
-
-# Parse Interactive tuning from prop
-if [ "`grep "kernel.interactive=performance" /system/unikernel.prop`" != "" ]; then
-	# apollo	
-	echo "12000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
-	echo "45000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
-	echo "80"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
-	echo "1"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy
-	echo "70"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
-	echo "35000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
-	echo "20000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
-	# atlas
-	echo "25000 1300000:20000 1700000:20000" > /sys/devices/system/cpu/cpu4/cpufreq/interactive/above_hispeed_delay
-	echo "45000"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/boostpulse_duration
-	echo "83"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/go_hispeed_load
-	echo "1"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/io_is_busy
-	echo "60 1500000:70"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
-	echo "35000"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/min_sample_time
-	echo "15000"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_rate
-elif [ "`grep "kernel.interactive=battery" /system/unikernel.prop`" != "" ]; then
-	# apollo	
-	echo "37000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay
-	echo "25000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/boostpulse_duration
-	echo "80"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load
-	echo "0"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/io_is_busy
-	echo "90"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads
-	echo "15000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/min_sample_time
-	echo "15000"	> /sys/devices/system/cpu/cpu0/cpufreq/interactive/timer_rate
-	# atlas
-	echo "70000 1300000:55000 1700000:55000" > /sys/devices/system/cpu/cpu4/cpufreq/interactive/above_hispeed_delay
-	echo "25000"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/boostpulse_duration
-	echo "95"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/go_hispeed_load
-	echo "0"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/io_is_busy
-	echo "80 1500000:90"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads
-	echo "15000"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/min_sample_time
-	echo "15000"	> /sys/devices/system/cpu/cpu4/cpufreq/interactive/timer_rate
+# Apollo Maxfreq
+CFILE="/data/data/vindicator/APmaxfreq"
+if [ -f $CFILE ]; then 
+	FREQ=`cat $CFILE`
+	echo $FREQ > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
+fi	
+# Atlas Minfreq
+CFILE="/data/data/vindicator/ATminfreq"
+if [ -f $CFILE ]; then 
+	FREQ=`cat $CFILE`
+	echo $FREQ > /sys/devices/system/cpu/cpu4/cpufreq/scaling_min_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu5/cpufreq/scaling_min_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu6/cpufreq/scaling_min_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq
 fi
 
-sleep 5
-# Parse IO Scheduler from prop
-if [ "`grep "kernel.scheduler=noop" /system/unikernel.prop`" != "" ]; then
-	echo "noop" > /sys/block/mmcblk0/queue/scheduler
-    	echo "noop" > /sys/block/sda/queue/scheduler
-elif [ "`grep "kernel.scheduler=fiops" /system/unikernel.prop`" != "" ]; then
-	echo "fiops" > /sys/block/mmcblk0/queue/scheduler
-    	echo "fiops" > /sys/block/sda/queue/scheduler
-elif [ "`grep "kernel.scheduler=bfq" /system/unikernel.prop`" != "" ]; then
-	echo "bfq" > /sys/block/mmcblk0/queue/scheduler
-    	echo "bfq" > /sys/block/sda/queue/scheduler
-elif [ "`grep "kernel.scheduler=deadline" /system/unikernel.prop`" != "" ]; then
-	echo "deadline" > /sys/block/mmcblk0/queue/scheduler
-    	echo "deadline" > /sys/block/sda/queue/scheduler
-else
-	echo "cfq" > /sys/block/mmcblk0/queue/scheduler
-    	echo "cfq" > /sys/block/sda/queue/scheduler
+# Atlas Maxfreq
+CFILE="/data/data/vindicator/ATmaxfreq"
+if [ -f $CFILE ]; then 
+	FREQ=`cat $CFILE`
+	echo $FREQ > /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu5/cpufreq/scaling_max_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu6/cpufreq/scaling_max_freq
+	echo $FREQ > /sys/devices/system/cpu/cpu7/cpufreq/scaling_max_freq
 fi
+	
+#PEWQ's
+CFILE="/data/data/vindicator/PEWQ"
+SFILE="/sys/module/workqueue/parameters/power_efficient"
+[ -f $CFILE ] && echo `cat $CFILE` > $SFILE
 
-# Parse VM Tuning from prop
-if [ "`grep "kernel.vm=tuned" /system/unikernel.prop`" != "" ]; then
-	echo "200"	> /proc/sys/vm/vfs_cache_pressure
-	echo "400"	> /proc/sys/vm/dirty_expire_centisecs
-	echo "400"	> /proc/sys/vm/dirty_writeback_centisecs
-	echo "145"	> /proc/sys/vm/swappiness
-	echo "64"	> /sys/block/sda/queue/read_ahead_kb
-	echo "64"	> /sys/block/sdb/queue/read_ahead_kb
-	echo "64"	> /sys/block/sdb/queue/read_ahead_kb
-	echo "64"	> /sys/block/vnswap0/queue/read_ahead_kb
-fi
+#FSync
+CFILE="/data/data/vindicator/SHWL"
+SFILE="/sys/module/wakeup/parameters/enable_sensorhub_wl"
+[ -f $CFILE ] && echo `cat $CFILE` > $SFILE
 
-# Parse GApps wakelock fix from prop
-if [ "`grep "kernel.gapps=true" /system/unikernel.prop`" != "" ]; then
-	sleep 60
-	su -c "pm enable com.google.android.gms/.update.SystemUpdateActivity"
-	su -c "pm enable com.google.android.gms/.update.SystemUpdateService"
-	su -c "pm enable com.google.android.gms/.update.SystemUpdateService$ActiveReceiver"
-	su -c "pm enable com.google.android.gms/.update.SystemUpdateService$Receiver"
-	su -c "pm enable com.google.android.gms/.update.SystemUpdateService$SecretCodeReceiver"
-	su -c "pm enable com.google.android.gsf/.update.SystemUpdateActivity"
-	su -c "pm enable com.google.android.gsf/.update.SystemUpdatePanoActivity"
-	su -c "pm enable com.google.android.gsf/.update.SystemUpdateService"
-	su -c "pm enable com.google.android.gsf/.update.SystemUpdateService$Receiver"
-	su -c "pm enable com.google.android.gsf/.update.SystemUpdateService$SecretCodeReceiver"
-fi
+#Task Packing
+CFILE="/data/data/vindicator/packing"
+SFILE="/sys/kernel/hmp/packing_enable"
+[ -f $CFILE ] && echo `cat $CFILE` > $SFILE
 
+#Power Aware Scheduling
+CFILE="/data/data/vindicator/PAS"
+SFILE="/sys/kernel/hmp/power_migration"
+[ -f $CFILE ] && echo `cat $CFILE` > $SFILE
+
+#DT2W
+CFILE="/data/data/vindicator/DT2W"
+SFILE="/sys/android_touch/doubletap2wake"
+[ -f $CFILE ] && echo `cat $CFILE` > $SFILE
