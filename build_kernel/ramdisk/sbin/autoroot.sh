@@ -5,8 +5,7 @@
 
 mount -o remount,rw /system
 # Parse init/d support from prop. If AUTO mode check to see if support has been added to the rom
-if [ "`grep "kernel.initd=true" /system/unikernel.prop`" != "" ]; then
-	if [ "`grep "init.d" /system/etc/init.sec.boot.sh`" = "" ]; then
+if [ "`grep "init.d" /system/etc/init.sec.boot.sh`" = "" ]; then
 		mount -t rootfs -o remount,rw rootfs
 	fi
 fi
@@ -68,10 +67,7 @@ fi
 rm -rf /system/app/SecurityLogAgent
 
 # Execute init.d if Auto or ROM control
-if [ "`grep "kernel.initd=true" /system/unikernel.prop`" != "" ]; then
 	#enforce init.d script perms on any post-root added files
-	chmod 755 /system/etc/init.d
-	chmod 755 /system/etc/init.d/*
 	if [ "`grep "init.d" /system/etc/init.sec.boot.sh`" = "" ]; then
 		# run init.d scripts
 		if [ -d /system/etc/init.d ]; then
