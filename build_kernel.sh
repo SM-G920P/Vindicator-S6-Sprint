@@ -1,3 +1,4 @@
+
 #!/bin/bash
 # kernel build script by thehacker911
 
@@ -79,8 +80,12 @@ REPACK_KERNEL()
 
 	      find . -name "*.ko" -exec cp {} $BUILD_KERNEL_DIR/build_kernel/zip_files/system/lib/modules/ \;
 
+	      rm $BUILD_KERNEL_DIR/build_kernel/zip_files/system/lib/modules/placeholder
+
 	      cd build_kernel
+	      mkdir backup_image
 	      cp -r Image backup_image/zImage
+	      rm output_kernel/*.zip
 
 	      echo "Making boot.img ..."
 	      $DTBTOOL -o dt.img -s $BOARD_KERNEL_PAGESIZE -p ../scripts/dtc/ ../arch/arm64/boot/dts/ | sleep 1
@@ -93,23 +98,20 @@ REPACK_KERNEL()
 	      ./mkboot boot boot.img
 	      #./mkboot boot.img boot
 
-              cp boot.img zip_files/boot.img
-
 	      echo "Making zip ..."
-	      cp $BOOTIMG $FLASH_ZIP_FILES/boot.img
+	      cp $BOOTIMG $FLASH_ZIP_FILES/kernel/boot.img
 	      cd $FLASH_ZIP_FILES
-	      zip -r $KERNEL_NAME.zip META-INF system boot.img
+	      zip -r $KERNEL_NAME.zip META-INF system kernel data
 	      mv $KERNEL_NAME.zip $OUTPUT_DIR
-
-	      echo "Making cleaning ..."
-	      find . -name "*.ko" -exec rm {} \;
-	      cd ..
-	      rm dt.img
-	      rm boot.img
-	      rm Image
-	      rm zip_files/boot.img
-	      rm boot/zImage
-	      rm boot/dt.img
+	      
+	      echo "repack normal version + su systemless"
+	      cp backup_image/dt.img boot_su_266/dt.img
+	      cp backup_image/zImage boot_su_266/zImage
+	      ./mkboot boot_su_266 boot.img
+	      cp $BOOTIMG $FLASH_ZIP_FILES/kernel/boot.img
+	      cd $FLASH_ZIP_FILES
+	      zip -r $KERNEL_NAME$SU_VER.zip META-INF system kernel data
+	      mv $KERNEL_NAME$SU_VER.zip $OUTPUT_DIR
 	      
 	      cd ..
 	      rm -rf /arch/arm64/boot/dts/.*.tmp
