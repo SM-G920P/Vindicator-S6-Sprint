@@ -15,7 +15,7 @@ DTS=arch/arm64/boot/dts
 IMG=arch/arm64/boot
 DC=arch/arm64/configs
 BK=build_kernel
-OUT=../output
+OUT=media/Out_Partition/output
 DT=exynos7420-zero_common.dtb
 
 # Cleanup old files from build environment
