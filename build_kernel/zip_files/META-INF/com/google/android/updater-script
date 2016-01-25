@@ -1,0 +1,26 @@
+ui_print("");
+ui_print("");
+ui_print(" ###################### ");
+ui_print("      Smoooth Kernel    ");
+ui_print("       by mtb3000gt     ");
+ui_print(" ###################### ");
+ui_print("");
+ui_print("");
+show_progress(1.000000, 0);
+
+ui_print("Flashing Kernel...");
+set_progress(0.100000);
+package_extract_file("boot.img", "/dev/block/platform/15570000.ufs/by-name/BOOT")
+
+set_progress(1.000000);
+show_progress(1.000000, 0);
+
+ui_print("");
+ui_print(" ###################### ");
+ui_print("      Smoooth Kernel    ");
+ui_print("       by mtb3000gt     ");
+ui_print(" ###################### ");
+
+ui_print("");
+ui_print("Brought to you by * mtb3000gt *");
+ui_print("Done, please reboot...");

@@ -1,0 +1,12 @@
+#Name
+Vindicator-S6-Sprint
+#Device
+-SM-G920P
+#Version
+-V1
+#Zip-Name
+Vindicator-kernel
+#Toolchain
+UBERTC-aarch64-linux-android-5.3/bin/aarch64-linux-android-
+#Device
+-SM-G920P-Userbuild
