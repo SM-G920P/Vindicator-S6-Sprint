@@ -67,7 +67,7 @@ if [ "$xc" = "X" -o "$xc" = "x" ]; then
 	# Make and xconfig our defconfig
 	echo -n "Loading xconfig ..................................."
 	cp $DC/$FIT .config
-	xterm -e make ARCH=arm64 xconfig
+	make ARCH=arm64 xconfig
 	echo "Done"
 	mv .config $DC/$FIT
 fi
@@ -77,7 +77,7 @@ echo
 
 echo -n "Compiling Kernel .................................."
 cp $DC/$FIT .config
-xterm -e make ARCH=arm64 -j4
+make ARCH=arm64 -j4
 # xterm -e make ARCH=arm64 INSTALL_MOD_PATH=.. modules_install
 if [ -f "arch/arm64/boot/Image" ]; then
 	echo "Done"
@@ -135,11 +135,11 @@ echo "Done"
 
 echo -n "Creating flashable zip............................."
 cd ../$OUT #move to output directory
-xterm -e zip -r TWRP_kernel.zip *
+zip -r TWRP_kernel.zip *
 echo "Done"
 echo -n "Creating ODIN tar.................................."
 cd skrn
-xterm -e tar -H ustar -cvf ODIN_kernel.tar boot.img
+tar -H ustar -cvf ODIN_kernel.tar boot.img
 md5sum -t ODIN_kernel.tar >> ODIN_kernel.tar
 cd ..
 mv skrn/ODIN_kernel.tar ODIN_kernel.tar
@@ -151,8 +151,8 @@ echo
 cd ../ksource
 read -p "Do you want to Clean the source? (y/n) > " mc
 if [ "$mc" = "Y" -o "$mc" = "y" ]; then
-	xterm -e make clean
-	xterm -e make mrproper
+	make clean
+	make mrproper
 fi
 rm -rf ../lib
 
