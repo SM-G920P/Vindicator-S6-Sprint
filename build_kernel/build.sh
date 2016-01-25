@@ -158,7 +158,7 @@ rm -rf ../lib
 
 ############################################# CLEANUP ##########################################
 
-cd ../ksource/$BK
+cd ../$BK
 rm -rf ramdisk.cpio.gz
 rm -rf Image*
 rm -rf boot*.img
